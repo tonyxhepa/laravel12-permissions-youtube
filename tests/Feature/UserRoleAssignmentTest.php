@@ -110,6 +110,7 @@ describe('User Creation with Roles', function () {
     });
 
     it('redirects to users after successful creation', function () {
+        Role::create(['name' => 'role_1']);
         Livewire::test(UserCreate::class)
             ->set('name', 'Test User')
             ->set('email', 'test@example.com')
@@ -277,9 +278,11 @@ describe('User Listing and Deletion', function () {
         // Create more than 10 users to test pagination
         User::factory()->count(15)->create();
 
-        $component = Livewire::test(UserIndex::class);
+        Livewire::test(UserIndex::class)
+            ->assertViewHas('users', function ($users) {
+                return $users->count() === 10; // Default pagination
+            });
 
-        expect($component->get('users'))->toHaveCount(10); // Default pagination
     });
 
     it('can delete a user', function () {
@@ -326,8 +329,7 @@ describe('User Role Assignment Authorization', function () {
     it('requires authentication to access user management', function () {
         auth()->logout();
 
-        Livewire::test(UserCreate::class)
-            ->assertStatus(401);
+        $this->get('/users/create')->assertRedirect('/login');
     });
 
     it('can be accessed by authenticated users', function () {

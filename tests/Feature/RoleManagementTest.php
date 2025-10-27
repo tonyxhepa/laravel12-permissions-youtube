@@ -163,7 +163,7 @@ describe('Role Listing and Deletion', function () {
 
         Livewire::test(RoleIndex::class)
             ->assertViewHas('roles', function ($roles) {
-                return $roles->count() === 2;
+                return $roles->count() === 3; // including the super_admin role
             });
     });
 
